@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reward System</title>
+    <style>
+        body {
+            font-family: sans-serif;
+        }
+        .profile {
+            border: 1px solid #ccc;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .transfer-form {
+            border: 1px solid #eee;
+            padding: 10px;
+            margin-top: 10px;
+        }
+        .question {
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+        .answer {
+            border: 1px solid #eee;
+            padding: 10px;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="profile" id="userProfile">
+        <h2>Your Profile</h2>
+        <p>Points: <span id="userPoints">0</span></p>
+        <div class="transfer-form">
+            <h3>Transfer Points</h3>
+            <input type="text" id="transferUsername" placeholder="Username">
+            <input type="number" id="transferAmount" placeholder="Points to transfer">
+            <button onclick="transferPoints()">Transfer</button>
+            <p id="transferMessage"></p>
+        </div>
+    </div>
+
+    <div class="question">
+        <h3>Question 1</h3>
+        <button onclick="answerQuestion()">Answer</button>
+        <div class="answer" id="answer1" style="display: none;">
+            <p>This is the answer.</p>
+            <button onclick="upvoteAnswer('answer1')">Upvote (<span id="upvotes1">0</span>)</button>
+            <button onclick="downvoteAnswer('answer1')">Downvote</button>
+            <button onclick="removeAnswer('answer1')">Remove</button>
+        </div>
+    </div>
+
+    <script>
+        let userPoints = 0;
+        let upvotes1 = 0;
+
+        function updatePoints() {
+            document.getElementById('userPoints').textContent = userPoints;
+        }
+
+        function answerQuestion() {
+            userPoints += 5;
+            updatePoints();
+            document.getElementById('answer1').style.display = 'block';
+        }
+
+        function upvoteAnswer(answerId) {
+            upvotes1++;
+            document.getElementById('upvotes1').textContent = upvotes1;
+            if (upvotes1 === 5) {
+                userPoints += 5;
+                updatePoints();
+            }
+        }
+
+        function downvoteAnswer(answerId) {
+            if (upvotes1 > 0) {
+                upvotes1--;
+                document.getElementById('upvotes1').textContent = upvotes1;
+                if(upvotes1 < 5 && userPoints >= 5){
+                    userPoints -= 5;
+                    updatePoints();
+                }
+            }
+            if(userPoints > 0){
+                userPoints -=1;
+                updatePoints();
+            }
+        }
+
+        function removeAnswer(answerId) {
+            if (document.getElementById(answerId).style.display === 'block') {
+                document.getElementById(answerId).style.display = 'none';
+                userPoints -= 5;
+                if(upvotes1 >= 5){
+                    userPoints -=5;
+                }
+                updatePoints();
+            }
+        }
+
+        function transferPoints() {
+            const username = document.getElementById('transferUsername').value;
+            const amount = parseInt(document.getElementById('transferAmount').value);
+            const transferMessage = document.getElementById('transferMessage');
+
+            if (userPoints >= 10 && userPoints >= amount && amount > 0) {
+                userPoints -= amount;
+                updatePoints();
+                transferMessage.textContent = `Transferred ${amount} points to ${username}`;
+            } else if (userPoints < 10){
+                transferMessage.textContent = "Insufficient points to transfer.";
+            } else if (userPoints < amount){
+                transferMessage.textContent = "Insufficient points to transfer the specified amount.";
+            } else if (amount <= 0){
+                transferMessage.textContent = "Please enter a positive value.";
+            }
+            else {
+                transferMessage.textContent = "Transfer failed.";
+            }
+        }
+
+        updatePoints(); // Initial point display
+    </script>
+
+</body>
+</html>
